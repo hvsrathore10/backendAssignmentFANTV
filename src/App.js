@@ -16,7 +16,7 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/progress', progressRoutes);
 
 app.get('/', (req, res) => {
-  res.send('LMS Backend API is running ✅');
+  res.send('LMS Backend API is running');
 });
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });

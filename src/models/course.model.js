@@ -5,7 +5,12 @@ const courseSchema = new mongoose.Schema({
   description: String,
   instructor: String,
   price: Number,
-  lessons: [{ title: String, videoUrl: String, resources: [String] }],
+  lessons: [{
+    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    title: String,
+    videoUrl: String,
+    resources: [String]
+  }],
   quizzes: [{
     questions: [{
       text: String,
