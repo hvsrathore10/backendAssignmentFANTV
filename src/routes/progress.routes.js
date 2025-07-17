@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth.middleware');
+const { generalLimiter } = require('../middlewares/rateLimiter');
 const Course = require('../models/course.model');
 const User = require('../models/user.model');
 
 // View course progress
-router.get('/:courseId', auth, async (req, res) => {
+router.get('/:courseId', auth, generalLimiter, async (req, res) => {
   try {
     const { courseId } = req.params;
     const user = await User.findById(req.user.id);
