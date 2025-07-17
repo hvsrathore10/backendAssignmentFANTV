@@ -1,37 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middlewares/auth.middleware');
-const Course = require('../models/course.model');
-const User = require('../models/user.model');
+const isAdmin = require('../middlewares/role.middleware');
+const { addQuizToCourse, attemptQuiz, getQuizScores } = require('../controllers/quiz.controller');
 
-// Attempt a quiz
-router.post('/:courseId/quizzes/:quizId/attempt', auth, async (req, res) => {
-  try {
-    const { courseId, quizId } = req.params;
-    const { answers } = req.body;
-    const course = await Course.findById(courseId);
-    const quiz = course.quizzes.id(quizId);
+// Admin adds quiz to a course
+router.post('/course/:courseId/quizzes', auth, isAdmin, addQuizToCourse);
 
-    let score = 0;
-    quiz.questions.forEach((q, idx) => {
-      if (q.correctIndex === answers[idx]) score++;
-    });
+// User attempts a quiz
+router.post('/:quizId/attempt', auth, attemptQuiz);
 
-    const user = await User.findById(req.user.id);
-    let progress = user.progress.find(p => p.courseId.toString() === courseId);
-    if (!progress) {
-      progress = { courseId, completedLessons: [], quizScores: [] };
-    }
-    progress.quizScores.push({ quizId, score });
-    user.progress = user.progress.filter(p => p.courseId.toString() !== courseId);
-    user.progress.push(progress);
-
-    await user.save();
-    res.json({ score });
-  } catch (error) {
-    res.status(500).json({ message: 'Quiz attempt failed', error: error.message });
-  }
-});
+// User views scores for a quiz
+router.get('/:quizId/scores', auth, getQuizScores);
 
 module.exports = router;
-

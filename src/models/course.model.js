@@ -12,7 +12,10 @@ const courseSchema = new mongoose.Schema({
     resources: [String]
   }],
   quizzes: [{
+    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    title: String,
     questions: [{
+      _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
       text: String,
       options: [String],
       correctIndex: Number

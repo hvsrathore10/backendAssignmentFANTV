@@ -3,8 +3,32 @@ const User = require('../models/user.model');
 
 exports.createCourse = async (req, res) => {
   try {
-    const { title, description, instructor, price, lessons, quizzes } = req.body;
-    const course = new Course({ title, description, instructor, price, lessons, quizzes });
+    const { title, description, instructor, price, lessons = [], quizzes = [] } = req.body;
+
+    const formattedLessons = lessons.map(lesson => ({
+      title: lesson.title,
+      videoUrl: lesson.videoUrl,
+      resources: lesson.resources || []
+    }));
+
+    const formattedQuizzes = quizzes.map(quiz => ({
+      title: quiz.title,
+      questions: quiz.questions.map(q => ({
+        text: q.text,
+        options: q.options,
+        correctIndex: q.options.indexOf(q.correct_answer)
+      }))
+    }));
+
+    const course = new Course({
+      title,
+      description,
+      instructor,
+      price,
+      lessons: formattedLessons,
+      quizzes: formattedQuizzes
+    });
+
     await course.save();
     res.status(201).json(course);
   } catch (error) {
